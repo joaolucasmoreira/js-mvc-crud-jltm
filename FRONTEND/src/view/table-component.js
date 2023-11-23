@@ -1,4 +1,4 @@
-const resultView = {
+const tableComponent = {
   build: () => {
     const root = document.getElementById("root");
     const tableResult = document.createElement("table");
@@ -14,9 +14,8 @@ const resultView = {
               <th scope="col">Senha</th>
             </tr>
         </thead>
-        <tbody id="users-result">
-       
-        </tbody>
+        <tbody id="users-result"></tbody>
+
     `;
     root.appendChild(tableResult);
   },
@@ -45,4 +44,4 @@ const resultView = {
     }
   },
 };
-export { resultView };
+export { tableComponent };

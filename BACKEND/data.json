@@ -1,14 +1,20 @@
 [
   {
     "nome": "adba",
-    "idade": "121",
+    "idade": 121,
     "login": "sadda",
     "senha": "1313"
   },
   {
     "nome": "23131",
-    "idade": "3213",
+    "idade": 3213,
     "login": "12321",
     "senha": "31231"
+  },
+  {
+    "nome": "12",
+    "idade": 2321,
+    "login": "3213213",
+    "senha": "1312312"
   }
 ]

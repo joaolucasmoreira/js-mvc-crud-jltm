@@ -1,26 +1,31 @@
-import { viewController } from "./view/viewController.js";
+import { view } from "./view/view.js";
 import { Usuario } from "./model/usuario.model.js";
-import { dataService } from "./api/data.service.js";
+import { usersService } from "./api/users.service.js";
 
-let data = [];
+let users = [];
+const nullUser = new Usuario("", null, "", "");
 const submitType = { NEW: 0, UPDATE: 1 };
 let submitState = submitType.NEW;
 let currentId = null;
 
 const loadData = async () => {
-  const temp = await dataService.carregarDados();
+  const temp = await usersService.carregarDados();
 
-  data = temp.map(
+  users = temp.map(
     (usuario) =>
       new Usuario(usuario.nome, usuario.idade, usuario.login, usuario.senha)
   );
 
-  viewController.update(data, new Usuario("", null, "", ""));
+  view.update(users, nullUser);
 };
+
+const getFormInputs = () => {
+   return new Usuario(nome.value, idade.value, login.value, senha.value);
+}
 
 const handleSubmit = (event) => {
   event.preventDefault();
-  const user = new Usuario(nome.value, idade.value, login.value, senha.value);
+  const user = getFormInputs;
   if (submitState == submitType.NEW) {
     addUser(user);
   } else if (submitState == submitType.UPDATE) {
@@ -28,61 +33,64 @@ const handleSubmit = (event) => {
     submitState = submitType.NEW;
     btnSub.innerText = "Salvar";
   }
-  viewController.update(data, new Usuario("", null, "", ""));
+  view.update(users, nullUser);
 };
 
 const addUser = (newUser) => {
-  data.push(newUser);
-  dataService.salvarDados(data);
+  users.push(newUser);
+  usersService.salvarDados(users);
 };
 
 const updateUser = (index, userToUpdate) => {
-  data[index] = userToUpdate;
+  users[index] = userToUpdate;
 };
 
 const deletUser = (index) => {
-  data.splice(index, 1);
+  users.splice(index, 1);
 };
 
-const clickEsquerdo = (event) => {
+const setEvents = () => {
+  const form = document.getElementById("signForm");
+  form.addEventListener("submit", handleSubmit);
+  const userList = document.getElementById("users-result");
+  userList.addEventListener("click", handleClick);
+  userList.addEventListener("contextmenu", handleClick);
+};
+
+const handleClick = (event) => {
   currentId = event.target.closest("tr").id.split("")[4];
-
-  let confirm = window.confirm(
-    "O usuário selecionado será carregado para edição!"
-  );
-
-  if (confirm) {
-    viewController.updateForm(data[currentId]);
-    submitState = submitType.UPDATE;
-    btnSub.innerText = "Update";
-  }
-};
-
-const clickDireito = (event) => {
-  event.preventDefault();
-  if (event.button == 2) {
-    currentId = event.target.closest("tr").id.split("")[4];
-    alert(`O ${data[currentId].getNome().toUpperCase()} será deletado!`);
-
-    let confirm = window.confirm("Certeza que quer deletar esse usuário?");
-
+  if ((event, type == "click")) {
+    let confirm = window.confirm(
+      "O usuário selecionado será carregado para edição!"
+    );
     if (confirm) {
-      deletUser(currentId);
-      viewController.update(data, new Usuario("", null, "", ""));
+      view.updateForm(users[currentId]);
+      submitState = submitType.UPDATE;
+      btnSub.innerText = "Update";
+    }
+  } else if ((event, type == "contextmenu")) {
+    event.preventDefault();
+    if (event.button == 2) {
+      currentId = event.target.closest("tr").id.split("")[4];
+      alert(`O ${users[currentId].getNome().toUpperCase()} será deletado!`);
+
+      let confirm = window.confirm("Certeza que quer deletar esse usuário?");
+
+      if (confirm) {
+        deletUser(currentId);
+        view.update(users, nullUser);
+      }
     }
   }
 };
+
 const controller = {
-  iniciar: () => {
-    viewController.build();
-    const form = document.getElementById("signForm");
-    form.addEventListener("submit", handleSubmit);
-    const userList = document.getElementById("users-result");
-    userList.addEventListener("click", clickEsquerdo);
-    userList.addEventListener("contextmenu", clickDireito);
-    window.onload = () =>{
+  run: () => {
+    view.render();
+    setEvents();
+    window.onload = () => {
       loadData();
-    }
+    };
   },
 };
 

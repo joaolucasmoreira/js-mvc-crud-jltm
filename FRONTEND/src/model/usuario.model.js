@@ -1,7 +1,7 @@
 class Usuario {
  constructor(nome, idade, login, senha){
   this.nome = nome;
-  this.idade = idade;
+  this.idade = parseInt(idade);
   this.login = login;
   this.senha = senha;
  } 
@@ -15,7 +15,7 @@ class Usuario {
   return this.idade;
  }
  setIdade(idade){
-  this.idade = idade;
+  this.idade = parseInt(idade);
  }
  getLogin(){
   return this.login;
