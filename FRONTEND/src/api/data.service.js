@@ -1,5 +1,5 @@
 const dataService = {
-    carregarDados: async () =>{
+    load: async () =>{
         try {
             const response = await fetch('http://localhost:7021/api/data');
             const data = await response.json();
@@ -10,7 +10,7 @@ const dataService = {
         }
     },
 
-    salvarDados: async (novosDados) =>{
+    save: async (novosDados) =>{
         try {
           const response = await fetch('http://localhost:7021/api/save', {
             method: "POST",
@@ -29,4 +29,4 @@ const dataService = {
       },
 }
 
-export {dataService}
+export { dataService }

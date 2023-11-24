@@ -1,20 +1,20 @@
 import { formComponent } from "./form-component.js";
-import { resultComponent } from "./table-component.js";
+import { tableComponent } from "./table-component.js";
 
-const viewController = {
-    render:()=>{
-        formComponent.render();
-        resultComponent.render();
-    },
+const view = {
+  render: () => {
+    formComponent.render();
+    tableComponent.render();
+  },
 
-    update:(userArray, userToUpdate)=>{        
-        resultComponent.update(userArray);
-        formComponent.update(userToUpdate);
-    },
+  update: (users, user) => {
+    formComponent.update(user);
+    tableComponent.update(users);
+  },
 
-    updateForm:(userToUpdate)=>{ 
-        formComponent.update(userToUpdate);
-    }
-}
+  updateForm: (user) => {
+    formComponent.update(user);
+  },
+};
 
-export {view}
+export { view };

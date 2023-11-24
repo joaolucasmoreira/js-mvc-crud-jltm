@@ -1,55 +1,91 @@
 import { view } from "./view/view.js";
 import { Usuario } from "./model/usuario.model.js";
-import { usersService } from "./api/users.service.js";
+import { dataService } from "./api/data.service.js";
 
 let users = [];
+let userId = null;
 const nullUser = new Usuario("", null, "", "");
+
 const submitType = { NEW: 0, UPDATE: 1 };
 let submitState = submitType.NEW;
-let currentId = null;
+
 
 const loadData = async () => {
-  const temp = await usersService.carregarDados();
-
-  users = temp.map(
-    (usuario) =>
-      new Usuario(usuario.nome, usuario.idade, usuario.login, usuario.senha)
+  const data = await dataService.load();
+  users = data.map(
+    (user) => new Usuario(user.nome, user.idade, user.login, user.senha)
   );
-
   view.update(users, nullUser);
 };
 
+
+//ES6
 const getFormInputs = () => {
-   return new Usuario(nome.value, idade.value, login.value, senha.value);
-}
+  return new Usuario(nome.value, idade.value, login.value, senha.value);
+};
 
 const handleSubmit = (event) => {
   event.preventDefault();
-  const user = getFormInputs;
+  const user = getFormInputs();
   if (submitState == submitType.NEW) {
     addUser(user);
   } else if (submitState == submitType.UPDATE) {
-    updateUser(currentId, user);
+    updateUser(userId, user);
     submitState = submitType.NEW;
-    btnSub.innerText = "Salvar";
+    btnSub.innerText = "Save";
   }
   view.update(users, nullUser);
 };
 
+//CRUD
 const addUser = (newUser) => {
   users.push(newUser);
-  usersService.salvarDados(users);
+  dataService.save(users);
 };
 
 const updateUser = (index, userToUpdate) => {
   users[index] = userToUpdate;
+  dataService.save(users);
 };
 
 const deletUser = (index) => {
   users.splice(index, 1);
+  dataService.save(users);
+};
+//FIM CRUD
+
+
+const handleClick = (event) => {
+  userId = event.target.closest("tr").id.split("")[4];
+  if (event.type === "click") {
+    const confirmarEdicao = window.confirm(
+      `Clicou com o botão esquerdo, e o ${users[userId]
+        .getNome()
+        .toUpperCase()} será carregado para edição`
+    );
+    if (confirmarEdicao) {
+      view.updateForm(users[userId]);
+      submitState = submitType.UPDATE;
+      btnSub.innerText = "Update";
+    }
+  } else if (event.type === "contextmenu") {
+    event.preventDefault();
+    if (event.button == 2) {
+      const confirmarDelecao = window.confirm(
+        `Clicou com o botão direito, e o ${users[userId]
+          .getNome()
+          .toUpperCase()} será deletado`
+      );
+
+      if (confirmarDelecao) {
+        deletUser(userId);
+        view.update(users, nullUser);
+      }
+    }
+  }
 };
 
-const setEvents = () => {
+const setEventsListeners = () => {
   const form = document.getElementById("signForm");
   form.addEventListener("submit", handleSubmit);
   const userList = document.getElementById("users-result");
@@ -57,37 +93,10 @@ const setEvents = () => {
   userList.addEventListener("contextmenu", handleClick);
 };
 
-const handleClick = (event) => {
-  currentId = event.target.closest("tr").id.split("")[4];
-  if ((event, type == "click")) {
-    let confirm = window.confirm(
-      "O usuário selecionado será carregado para edição!"
-    );
-    if (confirm) {
-      view.updateForm(users[currentId]);
-      submitState = submitType.UPDATE;
-      btnSub.innerText = "Update";
-    }
-  } else if ((event, type == "contextmenu")) {
-    event.preventDefault();
-    if (event.button == 2) {
-      currentId = event.target.closest("tr").id.split("")[4];
-      alert(`O ${users[currentId].getNome().toUpperCase()} será deletado!`);
-
-      let confirm = window.confirm("Certeza que quer deletar esse usuário?");
-
-      if (confirm) {
-        deletUser(currentId);
-        view.update(users, nullUser);
-      }
-    }
-  }
-};
-
 const controller = {
   run: () => {
     view.render();
-    setEvents();
+    setEventsListeners();
     window.onload = () => {
       loadData();
     };
